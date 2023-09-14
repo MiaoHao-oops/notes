@@ -1,5 +1,5 @@
 %.out: %.c
-	gcc $< -o $@ -lm
+	gcc $< -o $@ -lm -g
 
 clean:
 	rm -rf *.out

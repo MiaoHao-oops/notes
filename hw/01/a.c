@@ -1,11 +1,13 @@
 #include <math.h>
 #include <stdio.h>
 
-static const double C_a = 0.555;
+static const double C_a = 0.5555;
 static const double C_b = 10.0;
 static const double C_c = 6.11;
 static const double C_d = 5417.7530;
 static const double C_f = 273.16;
+
+#define F(x) ((double)(((double)(int)(my_abs(x) * 10.0 + 0.5)) / 10.0)) * sign(x)
 
 double H(double T, double D)
 {
@@ -33,23 +35,45 @@ int my_atoi(char c)
     return -1;
 }
 
+double my_abs(double x)
+{
+    return x >= 0.0 ? x : x * -1.0;
+}
+
+double sign(double x)
+{
+    return x >= 0.0 ? 1.0 : -1.0;
+}
+
 int main()
 {
-    char c[2];
-    double v[2];
+    char c[100][2];
+    double v[100][2], out[3];
+    int index[2], i = 0, j = 0;
 
-    while ((scanf("%c", &c[0])) != EOF) {
-        if (c[0] == 'E') break;
+    while ((scanf("%c", &c[i][0])) != EOF) {
+        if (c[i][0] == 'E') break;
 
-        scanf("%lf %c %lf\n", &v[0], &c[1], &v[1]);
-        
-        switch (my_atoi(c[0]) + my_atoi(c[1]))
-        {
-        case 1: 
-        case 2:
-        case 3: 
-        }
+        scanf("%lf %c %lf\n", &v[i][0], &c[i][1], &v[i][1]);
+        i++;
     }
+    
+    for (j = 0; j < i; j++) {
+        index[0] = my_atoi(c[j][0]);
+        index[1] = my_atoi(c[j][1]);
+        out[index[0]] = v[j][0];
+        out[index[1]] = v[j][1];
+
+        switch (index[0] + index[1])
+        {
+        case 1: out[2] = H(out[0], out[1]); break;
+        case 2: out[1] = D(out[0], out[2]); break;
+        case 3: out[0] = T(out[2], out[1]); break;
+        }
+        printf("T %.1lf D %.1lf H %.1lf\n", F(out[0]), F(out[1]), F(out[2]));
+        if (j < i - 1) putchar('\n');
+    }
+
 
     return 0;
 }
