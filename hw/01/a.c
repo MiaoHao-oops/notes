@@ -8,20 +8,28 @@ static const double C_d = 5417.7530;
 static const double C_f = 273.16;
 
 #define F(x) ((double)(((double)(int)(my_abs(x) * 10.0 + 0.5)) / 10.0)) * sign(x)
+#define roundd(x) (round(x * 10.0) / 10.0)
 
 double H(double T, double D)
 {
-    return T + C_a * (C_c * exp(C_d * (1 / C_f - 1 / (D + C_f))) - C_b);
+    double e = C_c * exp(C_d * (1 / C_f - 1 / (D + C_f)));
+    return T + C_a * (e - C_b);
 }
 
 double T(double H, double D)
 {
-    return H - C_a * (C_c * exp(C_d * (1 / C_f - 1 / (D + C_f))) - C_b);
+    double e = C_c * exp(C_d * (1 / C_f - 1 / (D + C_f)));
+    return H - C_a * (e - C_b);
 }
 
 double D(double T, double H)
 {
-    return 1 / (1 / C_f - (log(((H - T) / C_a + C_b) / C_c)) / C_d) - C_f;
+    double e = (H - T) / C_a + C_b;
+    double x_1 = log(e / C_c);
+    double x_2 = x_1 / C_d;
+    double x_3 = 1.0 / C_f - x_2;
+    double x_4 = 1.0 / x_3;
+    return x_4 - C_f;
 }
 
 int my_atoi(char c)
@@ -47,22 +55,15 @@ double sign(double x)
 
 int main()
 {
-    char c[100][2];
-    double v[100][2], out[3];
-    int index[2], i = 0, j = 0;
+    char c[2];
+    double v[2], out[3];
+    int index[2];
 
-    while ((scanf("%c", &c[i][0])) != EOF) {
-        if (c[i][0] == 'E') break;
-
-        scanf("%lf %c %lf\n", &v[i][0], &c[i][1], &v[i][1]);
-        i++;
-    }
-    
-    for (j = 0; j < i; j++) {
-        index[0] = my_atoi(c[j][0]);
-        index[1] = my_atoi(c[j][1]);
-        out[index[0]] = v[j][0];
-        out[index[1]] = v[j][1];
+    while ((scanf(" %c %lf %c %lf", &c[0], &v[0], &c[1], &v[1])) == 4) {
+        index[0] = my_atoi(c[0]);
+        index[1] = my_atoi(c[1]);
+        out[index[0]] = v[0];
+        out[index[1]] = v[1];
 
         switch (index[0] + index[1])
         {
@@ -70,10 +71,9 @@ int main()
         case 2: out[1] = D(out[0], out[2]); break;
         case 3: out[0] = T(out[2], out[1]); break;
         }
-        printf("T %.1lf D %.1lf H %.1lf\n", F(out[0]), F(out[1]), F(out[2]));
-        if (j < i - 1) putchar('\n');
-    }
 
+        printf("T %.1lf D %.1lf H %.1lf\n", roundd(out[0]), roundd(out[1]), roundd(out[2]));
+    }
 
     return 0;
 }
