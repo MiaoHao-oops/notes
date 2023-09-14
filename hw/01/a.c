@@ -7,9 +7,6 @@ static const float C_c = 6.11;
 static const float C_d = 5417.7530;
 static const float C_f = 273.16;
 
-#define F(x) ((float)(((float)(int)(my_abs(x) * 10.0 + 0.5)) / 10.0)) * sign(x)
-#define roundd(x) (round(x * 10.0) / 10.0)
-
 float H(float T, float D)
 {
     float e = C_c * exp(C_d * (1 / C_f - 1 / (D + C_f)));
@@ -43,23 +40,13 @@ int my_atoi(char c)
     return -1;
 }
 
-float my_abs(float x)
-{
-    return x >= 0.0 ? x : x * -1.0;
-}
-
-float sign(float x)
-{
-    return x >= 0.0 ? 1.0 : -1.0;
-}
-
 int main()
 {
     char c[2];
     float v[2], out[3];
     int index[2];
 
-    while ((scanf(" %c %lf %c %lf", &c[0], &v[0], &c[1], &v[1])) == 4) {
+    while ((scanf(" %c %f %c %f", &c[0], &v[0], &c[1], &v[1])) == 4) {
         index[0] = my_atoi(c[0]);
         index[1] = my_atoi(c[1]);
         out[index[0]] = v[0];
@@ -72,7 +59,7 @@ int main()
         case 3: out[0] = T(out[2], out[1]); break;
         }
 
-        printf("T %.1f D %.1f H %.1f\n", roundd(out[0]), roundd(out[1]), roundd(out[2]));
+        printf("T %.1f D %.1f H %.1f\n", out[0], out[1], out[2]);
     }
 
     return 0;
