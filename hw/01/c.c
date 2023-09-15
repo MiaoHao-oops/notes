@@ -23,17 +23,13 @@ int main()
                     break;
                 }
                 case 'u': {
-                    if (d[in[0][k] - 'A'] == 0)
-                        w[in[0][k] - 'A']++;
-                    if (d[in[1][k] - 'A'] == 0)
-                        w[in[1][k] - 'A']--;
+                    w[in[0][k] - 'A']++;
+                    w[in[1][k] - 'A']--;
                     break;
                 }
                 case 'd': {
-                    if (d[in[0][k] - 'A'] == 0)
-                        w[in[0][k] - 'A']--;
-                    if (d[in[1][k] - 'A'] == 0)
-                        w[in[1][k] - 'A']++;
+                    w[in[0][k] - 'A']--;
+                    w[in[1][k] - 'A']++;
                     break;
                 }
                 }
