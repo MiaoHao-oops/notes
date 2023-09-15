@@ -1,4 +1,7 @@
-1 
-ABCD EFGH even 
-ABCI EFJK up 
-ABIJ EFGH even 
+2
+B A up 
+CDEF AGHI up
+B A up 
+A B up
+AB CD down
+E F even

@@ -5,16 +5,19 @@
 int main()
 {
     int n, i, j, k, max, fake;
-    char in[3][4];
+    char in[3][12];
     int d[12], w[12];
     scanf("%d", &n);
 
     for (i = 0; i < n; i++) {
-        memset(d, 0, sizeof(d));
-        memset(w, 0, sizeof(w));
+        for (j = 0; j < 12; j++) {
+            d[j] = 0;
+            w[j] = 0;
+        }
         for (j = 0; j < 3; j++) {
-            scanf("%s %s %s", in[0], in[1], in[2]);
-            for (k = 0; k < 4; k++) {
+            scanf(" %s %s %s", in[0], in[1], in[2]);
+            // printf("%s %s %s\n", in[0], in[1], in[2]);
+            for (k = 0; k < strlen(in[0]); k++) {
                 switch(in[2][0])
                 {
                 case 'e': {
@@ -35,19 +38,16 @@ int main()
                 }
             }
         }
-        max = -1;
+        max = 0;
         fake = 0;
         
         for (j = 0; j < 12; j++) {
-            // printf("%d", w[j]);
-            if (d[j] != 0)
-                continue;
-            if (abs(w[j]) > max) {
+            if (d[j] == 0 && abs(w[j]) > max) {
                 max = abs(w[j]);
                 fake = j;
             }
         }
-        printf("%c is the counterfeit coin and it is %s.\n", fake + 'A', w[fake] <= 0 ? "light" : "heavy");
+        printf("%c is the counterfeit coin and it is %s.\n", fake + 'A', w[fake] < 0 ? "light" : "heavy");
     }
     return 0;
 }
