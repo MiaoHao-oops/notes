@@ -1,0 +1,473 @@
+\documentclass{article}
+\usepackage{CJK}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{forest}
+
+\newtheorem{pro}{Proposition}
+\newcommand{\bftit}[1]{\noindent\textbf{#1}}
+
+\title{Assignment 1: Divide And Conquer}
+\author{Miao Hao 202328013229045}
+\begin{document}
+    \maketitle
+    \Large
+    \section{Question Number 1}
+    
+    \subsection{\bftit{Problem Description}}
+    
+    Find the median of two sets, which size are both $n$, by querying for the $k^{th}$ element in a set, and cost atmost $O(\log{n})$ time.
+
+    \subsection{\bftit{Analyze}}
+
+    First, two sets are demoted by $A$ and $B$ respectively, and $S = A \cup B$. $Y[k]$ is for the $k^{th}$ element in the set $Y$. \textit{e.g.} The $k_{1}^{th}$ element in set $A$ is $A[k_{1}]$, and the median we want to find is $M = S[n]$. Elements in $S_{l}$ are lower than the median, when elements $S_{g}$ are greater than the median.
+
+    Second, we consider the simplest case of the porblem, and the value of $n$ is $1$. In this case, we should query at least $2$ times to decide $M$.
+
+    Third, we consider a more complex situation, for $n = 2$. Note that if we want to find $M = S[2]$, there must be 1 element lower than $M$ and 2 elements greater than $M$. Suppose that $k_{1} - 1$ elements are from $A$ and $k_{2} - 1$ elements are from $B$ to makes up $S_{l}$. The relation of $k_{1}$ and $k_{2}$ is declared by the following euqation:
+    
+    \begin{equation}
+        (k_{1} - 1) + (k_{2} - 1) = n - 1 \label{e1}
+    \end{equation}
+    
+    In this case, we first let $k_{1} = 1$. According to the equation, $k_{2} = 2$. Then we \textbf{query} for $A[k_1]$ and $B[k_2]$. 
+    
+    If $A[k_1] < B[k_2]$, then we \textbf{query} for $B[k_2 - 1]$. 
+    
+    \begin{enumerate}
+        \item If $A[k_1] > B[k_2 - 1]$, we can make sure that there is $(k_{1} - 1) + (k_{2} - 1) = n - 1 = 1$ element in $S$ which is lower than $A[k_1]$. In other words, $M = A[k_{1}] = A[1]$.
+        \item If $A[k_1] < B[k_2 - 1]$, which means that there are \textbf{at most} $(k_1 - 1) + (k_2 - 2) = 0$ elements in $S$ lower than $A[k_1]$. The next thing to do is greater $k_{1}$ and lower $k_{2}$. Next we let $k^\prime_{1} = k_1 + 1 = 2$, and $k^\prime_{2} = k_2 - 1 = 1$. Then we \textbf{query} for $A[k^\prime_{1}]$. If $A[k^\prime_{1}] < B[k^\prime_{2}]$, then $M = A[k^\prime_{1}] = A[2]$. If $A[k^\prime_{1}] > B[k^\prime_{2}]$, then $M = B[k^\prime_{2}] = B[1]$.
+    \end{enumerate}
+
+    If $A[k_1] > B[k_2]$, for $k_{1}$ could not be lower and $k_{2}$ could not be greater, we can make sure that there is $(k_{1} - 1) + (k_{2} - 1) = n - 1 = 1$ element in $S$ which is lower than $B[k_2]$. Therefore, $M = B[k_{2}] = B[2]$. 
+
+    Next, we consider common cases. First we prove a proposition.
+    \begin{pro}
+        Suppose that $M_{A}, M_{B}$ is the median of $A, B$ respectively, then the median of $S = A \cup B$, denoted by $M$, saticfices $\min\{M_{A}, M_{B}\} \le M \le \max\{M_{A}, M_{B}\}$.
+    \end{pro}
+
+    \begin{proof}
+        \
+
+        Without loss of generality, we suppose that $M_{A} < M_{B}$.
+
+        If $M < M_{A}$, since $M_{A}$ is the median of $A$, element number in $S_{l}$ from $A$ is lower than thoes from $B$, especially more elements which are greater than $M_{B}$ would be in $S_{l}$. According to the assumption, $M < M_{A} < M_{B}$, there would be elements that greater than $M$ in $S_{l}$, which makes a conflict. So we have proven that $M_{A} \le M$.
+        
+        If $M > M_{B}$, the same happens. So we have proven that $M \le M_{B}$.
+
+        In conclusion, $M_{A} \le M \le M_{M}$.
+    \end{proof}
+
+    The proposition above ensures that if we query for $M_{A}$ and $M_{B}$ first, then $M$ would be bounded by them. This conclusion leads to recursion. Before we give the algorithm, another proposition should be proven.
+
+    \begin{pro}
+        For all set $A$ and $B$,  $\exists !(k_{1}, k_{2})$, which satisfies equation (\ref{e1}) and $S_{l} = \{A[1], A[2], ..., A[k_{1} - 1], B[1], B[2], ..., B[k_{2} - 1]\}$.
+    \end{pro}
+
+    \begin{proof}
+        \
+
+        First, $\exists ! M\in S$ obviously. Assume that $M\in A$, and is the $k^{th}$ element. Then we let $k_{1} = k$, $k_{2} = n - k_{1} + 1$.
+
+        Because $M$ is unique, $k$ is unique. Therefore, $(k_{1}, k_{2})$ is unique.
+    \end{proof}
+
+    According to \textbf{Proposition 1} and \textbf{Proposition 2}, we can find $M$ by reducing the range of $k_{1}$ and $k_{2}$. The initial problem is reduced to a \textbf{search problem}, and we can use \textbf{binary search} to find $k_{1}$. Here comes the algorithm in natural language:
+
+    \begin{enumerate}
+        \item Given a search range $(begin, end)$, let $\displaystyle k_{1} = \frac{begin + end}{2}$, $k_{2} = n - k_{1} + 1$. \textbf{Query} for $A[k_{1}]$ and $B[k_{2}]$. If $begin \ge end$, the median is found and its value is $\min\{A[k_{1}], B[k_{2}]\}$.
+        \item Decide the next step according to cases:
+        \begin{itemize}
+            \item If $A[k_{1}] < B[k_{2}]$, \textbf{query} for $B[k_{2} - 1]$, goto step 3.;
+            \item If $A[k_{1}] > B[k_{2}]$, \textbf{query} for $A[k_{1} - 1]$, goto step 4..
+        \end{itemize}
+        \item Decide the next step according to cases:
+        \begin{itemize}
+            \item If $A[k_{1}] < B[k_{2} - 1]$, goto step 1., give the range $(k_{1} + 1, end)$;
+            \item If $A[k_{1}] > B[k_{2} - 1]$, the median is found and its value is $A[k_{1}]$.
+        \end{itemize}
+        \item Decide the next step according to cases:
+        \begin{itemize}
+            \item If $A[k_{1} - 1] > B[k_{2}]$, goto step 1., give the range $(begin, k_{1} - 1)$;
+            \item If $A[k_{1} - 1] < B[k_{2}]$, the median is found and its value is $B[k_{2}]$.
+        \end{itemize}
+    \end{enumerate}
+
+    \subsection{\bftit{Persudo Code}}
+
+    \begin{algorithm}[h]
+        \large
+        \caption{EX 1}
+        \begin{algorithmic}[1]
+            \Function {FindMedian}{$A, B, n, begin, end$}
+            \State $\displaystyle k_{1} \gets \frac{begin + end}{2}$
+            \State $\displaystyle k_{2} \gets n - k_{1} + 1$
+            \State $A[k_{1}] \gets \textbf{query}(A, k_{1})$
+            \State $B[k_{2}] \gets \textbf{query}(B, k_{2})$
+            \If {$begin \ge end$}
+                \State \Return{$\min\{A[k_{1}], B[k_{2}]\}$}
+            \EndIf
+
+            \If {$A[k_{1}] < B[k_{2}]$}
+                \State $B[k_{2} - 1] \gets \textbf{query}(B, k_{2} - 1)$
+                \If {$A[k_{1}] < B[k_{2} - 1]$}
+                    \State \Call{FindMedian}{$A, B, n, k_{1} + 1, end$}
+                \Else 
+                    \State \Return{$A[k_{1}]$}
+                \EndIf
+            \Else
+                \State $A[k_{1} - 1] \gets \textbf{query}(A, k_{1} - 1)$
+                \If {$A[k_{1} - 1] > B[k_{2}]$}
+                    \State \Call{FindMedian}{$A, B, n, begin, k_{1} - 1$}
+                \Else 
+                    \State \Return{$B[k_{2}]$}
+                \EndIf
+            \EndIf
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \subsection{\bftit{Time Complexity}}
+    In the worst case, $T(n) = T(n/2) + O(1)$, for the algorithm reduces the problem size by half each time it calls itself. The subproblem reduction graph is shown as follows:
+
+    \begin{center}
+        \begin{forest}
+            [FindMedian($n$) $\cdots O(1)$
+                [FindMedian($n/2$) $\cdots O(1)$
+                    [FindMedian($n/4$) $\cdots O(1)$
+                        []
+                    ]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+
+    \begin{equation*}
+        \vdots
+    \end{equation*}
+
+    \begin{center}
+        \begin{forest}
+            [
+                [FindMedian($1$) $\cdots O(1)$]
+            ]
+        \end{forest}
+    \end{center}
+
+    The depth of the subproblem reduction tree is $\log{n}$. Therefore, the time complexity of the algorithm $T(n) = O(\log{n})$.
+
+    \subsection{\bftit{Correctness}}
+
+    \begin{proof}
+        \
+
+        First, $(k_{1} - 1) + (k_{2} - 1) = n - 1$ is satisfied all the time.
+
+        We modify the value of $k_{1}$ to reduce. When we find $A[k_{1}] < B[k_{2}]$, if we choose $A[k_{1}]$ as the median, the number of element of $B$ in $S_{l}$ must be $k_{2}$. Thus, $A[k_{1}] > B[k_{2} - 1]$ should be ensured. So if $A[k_{1}] > B[k_{2} - 1]$, $A[k_{1}]$ is the median we want to find.
+
+        If $A[k_{1}] > B[k_{2} - 1]$ is not satisfied, if we still choose $A[k_{1}]$ as the median, the number of elements in $S_{l}$ is less than $n - 1$, which dose not meet the requirement. So we should make $k_{1}$ greater using the technique of \textbf{binary search}.
+
+        Another case is symmetrical to the case has analyzed.
+
+        Next, the size of the search range keeps reducing, so the algorithm would come to an end.
+        \end{proof}
+
+    \section{EX.4}
+    \subsection{\bftit{Problem}}
+
+    Count the node number of a complete binary tree, and cost at most $O((\log(n))^{2})$ time.
+
+    \subsection{\bftit{Analyze}}
+
+    To count the node number of a complete binary tree, we should know the depth of the tree $d$ (the depth of root node is 0) and the node number of the deepest layer of the tree $n_{d}$. Then, the node number of the tree is:
+
+    \begin{equation}
+        N_{T} = 2^{d} + n_{d} - 1 \label{e2}
+    \end{equation}
+
+    So our goal is to acquire $d$ and $n_{d}$ in $O((\log(n))^{2})$ time.
+
+    To get the depth of a tree, we should get the depth of the left subtree and the right subtree and choose a greater one, then add 1. For a complete binary tree, we do not need to know the depth of a tree's two shubtrees. We can go forward the left child node of each node from the root node to get the depth of a complete binary tree.
+
+    Here's an example:
+
+    \begin{center}
+        \begin{forest}
+            [
+                1
+                [
+                    2
+                    [
+                        4
+                        [8]
+                    ]
+                    [5]
+                ]
+                [
+                    3
+                    [6]
+                    [7]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+
+    We can start with the path $1\to 2\to 4\to 8$ to acquire the depth of the complete binary tree above, and its depth is $4$.
+
+    The second step is to get $n_{d}$. We can reduce the problem as "to find the last node in the deepest layer of the complete binary tree" and it is a \textbf{serch prolem}. Thus, we can still ues the technique of \textbf{binary search}. Assume that there is an array with length $2^{d}$ to represent the nodes in the deepest layer of the complete binary tree. If the parent does not have a child, then use $0$ to fill the array. Otherwise, $1$ is used to fill the array. The array for the tree above is $[1, 0, 0, 0, 0, 0, 0, 0]$. Given an array makes up with continuous $1$ and $0$, we want to find the last $1$ in the array. First, the array is separated into two parts: $[1, 0, 0, 0]$ and $[0, 0, 0, 0]$. Choose the part begin with $1$, and do a further separation: $[1, 0]$ and $[0, 0]$. Repeat the steps, and finially we find the last $1$ in the array, and it is the first element in the array.
+
+    % First, to count the node number of a binary tree, we can use an equation:
+
+    % \begin{equation}
+    %     N_{T} = N_{T_{l}} + N_{T_{r}} + 1 \label{e2}
+    % \end{equation}
+
+    % where $N_{T}$ is the node number of tree $T$, $N_{T_{l}}$, $N_{T_{r}}$ is the node number of the left subtree and right subtree of $T$ respectively.
+    
+    % Then, we consider the simplest case where $n = 1$, $N_{T} = N_{T_{l}} + N_{T_{r}} + 1 = 0 + 0 + 1 = 1$;
+
+    % \dots
+
+    % For common cases, equation (\ref{e2}) is still avaliable, thus the problem size is reduced from $n$ to $2\times n / 2$.
+    
+    The algorithm in natural language:
+
+    1) Given a complete binary tree $T_{c}$, go down by left to get the depth $d$, give $T_{c}$ and range $(1, 2^{d})$ to step 2);
+
+    2) Given a complete binary tree $T_{c}$ and a range $(begin, end)$, get $n_{d}$ by follows:
+
+    $\bullet$ If $begin \ge end$, $n_{d}$ is found and its value is $begin$.
+
+    $\bullet$ Get $d_{l}$ and $d_{r}$, which are the depth of subtrees of the root of $T_{c}$;
+
+    $\bullet$ If $d_{l} = d_{r}$, give the right subtree of root $T_{r}$ and range $(end / 2 + 1, end)$ to step 2);
+
+    $\bullet$ If $d_{l} > d_{r}$, give the left subtree of root $T_{l}$ and range $(begin, end / 2)$ to step 2).
+
+    3) Use equation(\ref{e2}) to calculate the node num of tree $T$.
+
+    \subsection{Persudo Code}
+    \begin{algorithm}[h]
+        \large
+        \caption{EX 4}
+        \begin{algorithmic}[1]
+            \Function{GetDepth}{$T_{c}$}
+                \If{$T_{c}\ !=\ NULL$}
+                    \State \Return{\Call{GetDepth}{$T_{c}.left$} + 1}
+                \EndIf
+                \State \Return{-1}
+            \EndFunction
+            \Function {GetNd}{$T_{c}, begin, end$}
+                \If{$begin = end$}
+                    \State \Return{$begin$}
+                \EndIf
+                \State $d_{l} \gets $\Call{GetDepth}{$T_{c}.left$}
+                \State $d_{r} \gets $\Call{GetDepth}{$T_{c}.right$}
+
+                \If{$d_{l} == d_{r}$}
+                    \State \Return{\Call{GetN}{$T_{c}.right, end / 2 + 1, end$}}
+                \ElsIf{$d_{l} > d_{r}$}
+                    \State \Return{\Call{GetN}{$T_{c}.left, begin, end / 2$}}
+                \EndIf
+            \EndFunction
+
+            \Function{GetNodeNum}{$T_{c}$}
+                \State $d \gets $\Call{GetDepth}{$T_{c}$}
+                \State $n_{d} \gets $\Call{GetN}{$T_{c}, 1, 2^{d}$}
+                \State \Return{$2^{d} + n_{d} - 1$}
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \subsection{Correctness}
+
+    \begin{proof}
+        From the defination of the complete binary tree, the algorithm to get the depth of a complete binary tree is correct.
+
+        Next, to find $d$ we use the technique of binary search. According to the properties of complete binary tree, 
+
+        1) the subtrees are complete;
+
+        2) for each node, $d_{l}\ge d_{r}$.
+
+        When $d_{l} = d_{r}$, here is an example:
+
+        \begin{center}
+            \begin{forest}
+                [
+                    1
+                    [
+                        2
+                        [
+                            4
+                            [8]
+                            [9]
+                        ]
+                        [
+                            5
+                            [10]
+                            [11]
+                        ]
+                    ]
+                    [
+                        3
+                        [
+                            6
+                            [12]
+                        ]
+                        [7]
+                    ]
+                ]
+            \end{forest}
+        \end{center}
+
+        the last node is in the right subtree of root $1$, so we choose the root's right child to continue our search.
+
+        When $d_{l} > d_{r}$, here is an example:
+
+        \begin{center}
+            \begin{forest}
+                [
+                    1
+                    [
+                        2
+                        [
+                            4
+                            [8]
+                            [9]
+                        ]
+                        [
+                            5
+                            [10]
+                            [11]
+                        ]
+                    ]
+                    [
+                        3
+                        [6]
+                        [7]
+                    ]
+                ]
+            \end{forest}
+        \end{center}
+
+        the last node is in the left subtree of root $1$, so we choose the root's left child to continue our search.
+
+        Because the search range keeps decreasing, the algorighm will begin finally.
+
+    \end{proof}
+
+    \subsection{Time Complexity}
+
+    The subproblem reduction graph of this porblem is:
+
+    \begin{center}
+        \begin{forest}
+            [$(1\ 2^{d})$
+                [$(1\ 2^{d - 1})$
+                    [$(1\ 2^{d - 2})$
+                        [$\cdots$]
+                        [$\cdots$]
+                    ]
+                    [$(2^{d - 2} + 1\ 2^{d - 1})$
+                        [$\cdots$]
+                        [$\cdots$]
+                    ]
+                ]
+                [$(2^{d - 1} + 1\ 2^{d})$
+                    [$\cdots$]
+                    [$\cdots$]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+
+    The time complexity $T(n) = O(\log{n})\times O(\log{n}) = O((\log{n})^{2})$, in which $O(\log{n})$ is the time complexity for getting the depth and binary serch.
+
+    \section{EX.6}
+
+    \subsection{Problem}
+
+    Given a binary tree $T$, please give an $O(n)$ algorithm to invert binary tree.
+
+    \subsection{Analyze}
+
+    This prolem is relatively easy. To invert a binary tree, we can exchange the left and right child of each node. Thus, this problem is reduced to a \textbf{traverse problem}.
+
+    For the simplest case, the node number of $T$ is $n = 1$. It is so simple that the inversion of $T$ is itself.
+
+    For $n = 2$, we exchange the left/right child with an empty node:
+
+    \begin{center}
+        \begin{forest}
+            [1
+                [2]
+                [NULL]
+            ]
+        \end{forest}
+        $$\Downarrow $$
+        \begin{forest}
+            [1
+                [NULL]
+                [2]
+            ]
+        \end{forest}
+    \end{center}
+
+    For common cases, we can get the inversion of $T$ by exchange the left and child of each node in $T$. We can traverse the tree in any order.
+
+    The algorithm in natual language is to exchange the children of each tree during the traverse.
+
+    \newpage
+    \subsection{Persudo Code}
+
+    \begin{algorithm}[h]
+        \caption{EX 6}
+        \large
+        \begin{algorithmic}[1]
+            \Function{Invert}{$T$}
+            \If{$T = NULL$}
+                \State \Return
+            \EndIf
+            \State \Call{Invert}{$T.left$}
+            \State \Call{Invert}{$T.right$}
+            \State $T.left \Longleftrightarrow T.right$
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \subsection{Correctness}
+    \begin{proof}
+        Since we traverse the tree, each node is visited only one time and its left and right child are exchanged, the algorithm is correct.
+    \end{proof}
+
+    \subsection{Time Complexity}
+    The subproblem reduction graph is:
+
+    \begin{center}
+        \begin{forest}
+            [$T$
+                [$T.left$
+                    [$T.left.left$
+                        [$\cdots$]
+                        [$\cdots$]
+                    ]
+                    [$T.left.right$
+                        [$\cdots$]
+                        [$\cdots$]
+                    ]
+                ]
+                [$T.right$
+                    [$\cdots$]
+                    [$\cdots$]
+                ]
+            ]
+        \end{forest}
+    \end{center}
+
+    The time complexity is the same as the node number, that is, $T(n) = O(n)$.
+\end{document}
