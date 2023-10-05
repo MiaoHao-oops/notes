@@ -45,38 +45,7 @@
 
     If $A[k_1] > B[k_2]$, for $k_{1}$ could not be lower and $k_{2}$ could not be greater, we can make sure that there is $(k_{1} - 1) + (k_{2} - 1) = n - 1 = 1$ element in $S$ which is lower than $B[k_2]$. Therefore, $M = B[k_{2}] = B[2]$. 
 
-    Next, we consider common cases. First we prove a proposition.
-    \begin{pro}
-        Suppose that $M_{A}, M_{B}$ is the median of $A, B$ respectively, then the median of $S = A \cup B$, denoted by $M$, saticfices $\min\{M_{A}, M_{B}\} \le M \le \max\{M_{A}, M_{B}\}$.
-    \end{pro}
-
-    \begin{proof}
-        \
-
-        Without loss of generality, we suppose that $M_{A} < M_{B}$.
-
-        If $M < M_{A}$, since $M_{A}$ is the median of $A$, element number in $S_{l}$ from $A$ is lower than thoes from $B$, especially more elements which are greater than $M_{B}$ would be in $S_{l}$. According to the assumption, $M < M_{A} < M_{B}$, there would be elements that greater than $M$ in $S_{l}$, which makes a conflict. So we have proven that $M_{A} \le M$.
-        
-        If $M > M_{B}$, the same happens. So we have proven that $M \le M_{B}$.
-
-        In conclusion, $M_{A} \le M \le M_{M}$.
-    \end{proof}
-
-    The proposition above ensures that if we query for $M_{A}$ and $M_{B}$ first, then $M$ would be bounded by them. This conclusion leads to recursion. Before we give the algorithm, another proposition should be proven.
-
-    \begin{pro}
-        For all set $A$ and $B$,  $\exists !(k_{1}, k_{2})$, which satisfies equation (\ref{e1}) and $S_{l} = \{A[1], A[2], ..., A[k_{1} - 1], B[1], B[2], ..., B[k_{2} - 1]\}$.
-    \end{pro}
-
-    \begin{proof}
-        \
-
-        First, $\exists ! M\in S$ obviously. Assume that $M\in A$, and is the $k^{th}$ element. Then we let $k_{1} = k$, $k_{2} = n - k_{1} + 1$.
-
-        Because $M$ is unique, $k$ is unique. Therefore, $(k_{1}, k_{2})$ is unique.
-    \end{proof}
-
-    According to \textbf{Proposition 1} and \textbf{Proposition 2}, we can find $M$ by reducing the range of $k_{1}$ and $k_{2}$. The initial problem is reduced to a \textbf{search problem}, and we can use \textbf{binary search} to find $k_{1}$. Here comes the algorithm in natural language:
+    According to simple cases, we can find $M$ by reducing the range of $k_{1}$ and $k_{2}$. The initial problem is reduced to a \textbf{search problem}, and we can use \textbf{binary search} to find $k_{1}$. Here comes the algorithm in natural language:
 
     \begin{enumerate}
         \item Given a search range $(begin, end)$, let $\displaystyle k_{1} = \frac{begin + end}{2}$, $k_{2} = n - k_{1} + 1$. \textbf{Query} for $A[k_{1}]$ and $B[k_{2}]$. If $begin \ge end$, the median is found and its value is $\min\{A[k_{1}], B[k_{2}]\}$.
@@ -97,11 +66,15 @@
         \end{itemize}
     \end{enumerate}
 
+    The begin search range is given as $(1, n)$.
+
+    \newpage
+
     \subsection{\bftit{Persudo Code}}
 
     \begin{algorithm}[h]
         \large
-        \caption{EX 1}
+        \caption{Question 1}
         \begin{algorithmic}[1]
             \Function {FindMedian}{$A, B, n, begin, end$}
             \State $\displaystyle k_{1} \gets \frac{begin + end}{2}$
@@ -167,14 +140,67 @@
 
         First, $(k_{1} - 1) + (k_{2} - 1) = n - 1$ is satisfied all the time.
 
-        We modify the value of $k_{1}$ to reduce. When we find $A[k_{1}] < B[k_{2}]$, if we choose $A[k_{1}]$ as the median, the number of element of $B$ in $S_{l}$ must be $k_{2}$. Thus, $A[k_{1}] > B[k_{2} - 1]$ should be ensured. So if $A[k_{1}] > B[k_{2} - 1]$, $A[k_{1}]$ is the median we want to find.
+        We modify the value of $k_{1}$ to reduce. When we find $A[k_{1}] < B[k_{2}]$, we choose $A[k_{1}]$ as $M$, the number of elements in $S_{l}$ which are from $B$ must be $k_{2}$. Thus, $A[k_{1}] > B[k_{2} - 1]$ should be ensured. So if $A[k_{1}] > B[k_{2} - 1]$, $A[k_{1}]$ is the median we want to find.
 
-        If $A[k_{1}] > B[k_{2} - 1]$ is not satisfied, if we still choose $A[k_{1}]$ as the median, the number of elements in $S_{l}$ is less than $n - 1$, which dose not meet the requirement. So we should make $k_{1}$ greater using the technique of \textbf{binary search}.
+        If $A[k_{1}] \le B[k_{2} - 1]$, if we still choose $A[k_{1}]$ as the median, the number of elements in $S_{l}$ is less than $n - 1$, which dose not meet the requirement. So we should make $k_{1}$ greater using the technique of \textbf{binary search}.
 
         Another case is symmetrical to the case has analyzed.
 
         Next, the size of the search range keeps reducing, so the algorithm would come to an end.
         \end{proof}
+    \newpage
+
+    \section{Question Number 2}
+    \subsection{\bftit{Problem Description}}
+    Given any 10 points, $p1 , p2 , ..., p10$ , on a two-dimensional Euclidean plane, please write an algorithm to find the distance between the closest pair of points.
+
+    (a) Using a brute-force algorithm to solve this problem, analyze the time complexity of your implemented brute-force algorithm and explain why the algorithm's time complexity is $O(n^2)$, where $n$ is the number of points.
+
+    (b) Propose an improved algorithm to solve this problem with a time complexity better than the brute-force algorithm. Describe the algorithm's idea and analyze its time complexity.
+
+    \subsection{Sub-Question (a)}
+
+    \subsubsection{\bftit{Analyze}}
+
+    The basic idea to find the distance between the closest pair of points is to check the distance of each pair of points.
+
+    \subsubsection{\bftit{Persudo Code}}
+
+    \begin{algorithm}[h]
+        \large
+        \caption{Question 2}
+        \begin{algorithmic}[1]
+            \Function {FindClosest}{$P, n, $}
+            \State $min \gets INF$
+            \For {$i \gets 1$ to $n - 1$}
+                \For {$j \gets i + 1$ to $n$}
+                    \If {\Call{distance}{$P[i], P[j]$} $< min$}
+                    \State $min \gets$ \Call{distance}{$P[i], P[j]$}
+                    \EndIf
+                \EndFor
+            \EndFor
+            \State \Return{$min$}
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+
+    \subsubsection{\bftit{Time Complexity}}
+
+    The comparison inside the $i, j$ loop will be executed for at most $n^2$ times. Thus, the time complexity of this algorighm is $O(n^2)$.
+
+    \subsubsection{\bftit{Correctness}}
+
+    \begin{proof}
+        \
+
+        This algorighm is obviously correct.
+    \end{proof}
+
+    \subsection{\bftit{Sub-Question (b)}}
+
+    \subsubsection{\bftit{Analyze}}
+
+    We can reduce the time complexity from $O(n)$ to $O(n\log n)$ using the technique of Divide and Conquer.
 
     \section{EX.4}
     \subsection{\bftit{Problem}}
