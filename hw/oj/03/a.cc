@@ -48,6 +48,6 @@ int main()
                 num[i] = num[idx2] + 1;
             }
         }
-        printf("%d %lld\n", num[n - 1] + 1, dp[n - 1] + 678);
+        printf("Case %d: %d %lld\n", x + 1, num[n - 1] + 1, dp[n - 1] + 678);
     }
 }
