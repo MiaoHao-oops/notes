@@ -2,52 +2,46 @@
 #include <cstdio>
 #include <cstring>
 
-long long dp[60];
 long long a[60];
-int num[60];
 
 int main()
 {
-    int T, n, t;
+    int T, n;
+    long long t;
+    int *dp;
+    long long *time;
     scanf("%d", &T);
 
     for (int x = 0; x < T; x++) {
-        memset(dp, 0, sizeof(dp));
-        memset(num, 0, sizeof(num));
-        scanf("%d%d", &n, &t);
+        scanf("%d%lld", &n, &t);
+        dp = (int*)malloc(sizeof(int) * (t + 1));
+        memset(dp, 0, sizeof(int) * (t + 1));
+        time = (long long*)malloc(sizeof(long long) * (t + 1));
+        memset(time, 0, sizeof(long long) * (t + 1));
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             scanf("%lld", &a[i]);
+        }
 
-        dp[0] = a[0] < t ? a[0] : 0;
-        num[0] = a[0] < t ? 1 : 0;
-        for (int i = 1; i < n; i++) {
-            long long max1 = -1, max2 = -1;
-            int idx1 = 0, idx2 = 0;
-            for (int j = 0; j < i; j++) {
-                if (max1 < dp[j]) {
-                    max1 = dp[j];
-                    idx1 = j;
-                }
-            }
-            for (int j = 0; j < i; j++) {
-                if (max2 < dp[j] + a[i] && dp[j] + a[i] < t) {
-                    max2 = dp[j] + a[i];
-                    idx2 = j;
-                }
-            }
-            if (a[i] > max2 && a[i] < t) {
-                max2 = a[i];
-                idx2 = i;
-            }
-            if (max1 > max2) {
-                dp[i] = max1;
-                num[i] = num[idx1];
-            } else {
-                dp[i] = max2;
-                num[i] = num[idx2] + 1;
+        t--;
+
+        // for (int i = 0; i < n; i++) {
+        //     printf("%lld ", a[i]);
+        // }
+        // printf("\n%lld %d\n", max_time, max_time_idx);
+
+        for (int i = 0; i < n; i++) {
+            for (int j = t; j >= a[i]; j--) {
+                long long ttime = time[j - a[i]] + a[i];
+                int tnum = dp[j - a[i]] + 1;
+                if (tnum == dp[j] && time[j] < ttime || dp[j] < tnum)
+                    dp[j] = tnum, time[j] = ttime;
             }
         }
-        printf("Case %d: %d %lld\n", x + 1, num[n - 1] + 1, dp[n - 1] + 678);
+
+        printf("Case %d: %d %lld\n", x + 1, dp[t] + 1, time[t] + 678);
+        
+        free(dp);
+        free(time);
     }
 }
