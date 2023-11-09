@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#define DEBUG
+// #define DEBUG
 
 typedef struct rect {
     long long x, y, z;
@@ -78,29 +78,29 @@ int main()
         }
 #endif
 
-        rect_t base = rects[0];
-        dp[0] = rects[0].z;
-        for (int i = n * 3 - 1; i >= 0; i--) {
-            if (rects[i].x == base.x || rects[i].y == base.y) {
-                if (rects[i].z > dp[i - 1]) {
-                    base = rects[i];
-                    dp[i] = rects[i].z;
-                } else {
-                    dp[i] = dp[i - 1];
+        rect_t base = rects[n * 3 - 1];
+        dp[n * 3 - 1] = rects[n * 3 - 1].z;
+        for (int i = n * 3 - 2; i >= 0; i--) {
+            long long max = -1;
+            for (int j = n * 3 - 1; j > i; j--) {
+                if (rects[j].x > rects[i].x && rects[j].y > rects[i].y) {
+                    max = std::max(max, dp[j] + rects[i].z);
                 }
+#ifdef DEBUG
+                printf("i: %d, j: %d, max: %lld\n", i, j, max);
+#endif
             }
-            else if (rects[i].x > base.x && rects[i].y > base.y) {
-                base = rects[i];
-                dp[i] = dp[i - 1] + rects[i].z;
-            } else {
-                dp[i] = dp[i - 1];
-            }
+            dp[i] = std::max(max, rects[i].z);
 #ifdef DEBUG
             printf("dp[%d]: %lld base:(%lld, %lld)\n", i, dp[i], base.x, base.y);
 #endif
         }
 
-        printf("Case %d: maximum height = %lld\n", case_num++, dp[n * 3 - 1]);
+        long long ans = -1;
+        for (int i = 0; i < n * 3; i++)
+            if (ans < dp[i])
+                ans = dp[i];
+        printf("Case %d: maximum height = %lld\n", case_num++, ans);
 
         free(rects);
         free(dp);
