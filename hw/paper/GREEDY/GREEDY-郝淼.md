@@ -11,7 +11,7 @@
 
 根据已知，有 $t_1=B[1]+J[1]$，$t_{max}=\Sigma_{i=1}^{max}B[i]+J[max]$，$J[1]\le J[max]$。交换 $J[1]$ 和 $J[max]$ 后，有 $t_1^{\prime}=B[max]+J[max]$，$t_{max}^{\prime}=\Sigma_{i=1}^{max}B[i]+J[1]$。
 
-因此，$t_1^{\prime}\le t_{max}$，$t_{max}^{\prime}\le t_{max}$，其他 $t_i$ 没有改变，从而 $t$ 不增，证毕。
+因此，$t_1^{\prime}\le t_{max}$，$t_{max}^{\prime}\le t_{max}$，对于其他下标 $j$，若 $j < max$，则 $t_j^{\prime} = B[max] + \Sigma_{i=2}^j B[i] + J[j] < B[max] + \Sigma_{i=2}^j B[i] + B[1] + \Sigma_{i=j+1}^{max-1} B[i] + J[max] =  t_{max}$，若 $j > max$，则 $t_j^{\prime} = t_j$ 没有改变，从而 $t$ 不增，证毕。
 
 根据**命题1**，只需要按照 $J[i]$ 从大到小的顺序选择，就可以保证总用时最小。
 
